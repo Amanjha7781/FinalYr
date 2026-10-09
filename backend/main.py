@@ -592,7 +592,9 @@ def init_tracker_db():
     conn.commit()
     conn.close()
 
-init_tracker_db()
+# No filesystem writes in the public serverless demo.
+if not DEMO_MODE:
+    init_tracker_db()
 
 class AddSkillRequest(BaseModel):
     user_id: str

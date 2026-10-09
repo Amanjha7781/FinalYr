@@ -38,6 +38,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           <UserProvider>
             <Navbar />
+            <aside role="note" className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-center text-sm text-amber-950">
+              ResumePro demo deployment by Aman Jha, based on the original vijayyh/FinalYr team project.
+              AI results may be sample data until API keys are configured. Do not upload private resumes or personal information.
+              Shared skill-tracker storage is disabled in this demo.
+            </aside>
             <div className="flex-1 flex flex-col relative z-10">
               {children}
             </div>

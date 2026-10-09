@@ -8,6 +8,7 @@ import requests
 import networkx as nx
 from fastapi import FastAPI, UploadFile, File, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
 from dotenv import load_dotenv
@@ -20,6 +21,22 @@ except ImportError:
 load_dotenv()
 
 app = FastAPI(title="Resume AI API")
+
+# Public portfolio demo: do not expose or store visitor tracker records.
+DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() != "false"
+
+@app.middleware("http")
+async def protect_demo_tracker(request, call_next):
+    path = request.url.path
+    if DEMO_MODE and path.startswith("/api/tracker"):
+        if request.method == "GET" and path == "/api/tracker/users":
+            return JSONResponse({"users": [], "demo": True})
+        if request.method == "GET" and path == "/api/tracker/skills":
+            return JSONResponse({"skills": [], "stats": {"total_active": 0, "to_learn": 0, "in_progress": 0, "mastered": 0, "removed": 0}, "demo": True})
+        if request.method == "GET" and path == "/api/tracker/history":
+            return JSONResponse({"history": [], "demo": True})
+        return JSONResponse({"detail": "Shared tracker storage is disabled in this public demo."}, status_code=403)
+    return await call_next(request)
 
 app.add_middleware(
     CORSMiddleware,
